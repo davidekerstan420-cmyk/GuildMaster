@@ -41,3 +41,7 @@ example
 # generated native folders
 /ios
 /android
+
+# .env
+EXPO_PUBLIC_SUPABASE_URL=https://klwwgnvpqzghumjfeojo.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_g3j2x4e6uLK7dlPnthllgg_nztjfGNf            
