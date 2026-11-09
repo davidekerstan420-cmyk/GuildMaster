@@ -38,6 +38,26 @@ export const auth = {
   link: '#1fb5a3',
 };
 
+/* ---------- User screens (mobile) ---------- */
+export const ui = {
+  background: '#dcc9a3',
+  banner: '#d4a94e',
+  card: '#cfb780',
+  button: '#a8672a',
+  buttonText: '#f6ecd0',
+  chip: '#d6dc6b',
+  text: '#2b1d17',
+  danger: '#b3261e',
+  segmentActive: '#cdb27c',
+  tabBar: '#6b3f35',
+  tabActive: '#c9d04a',
+  habitCard: '#cfb780',
+  toggleRing: '#a8672a',
+  toggleOff: '#8d8d8d',
+  toggleOn: '#c9d04a',
+  divider: '#2b1d17',
+};
+
 /* ---------- Admin panel (desktop web) ---------- */
 export const admin = {
   sidebar: colors.darkBrown,
