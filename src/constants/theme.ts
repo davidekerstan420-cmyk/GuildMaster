@@ -1,12 +1,9 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
+// src/constants/theme.ts
 import '@/global.css';
 
 import { Platform } from 'react-native';
 
+/* ---------- Shared palette ---------- */
 export const colors = {
   parchment: '#dcc9a3',
   brown: '#6b3f35',
@@ -20,23 +17,43 @@ export const colors = {
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 };
 export const radius = { sm: 8, md: 12, lg: 20 };
 
+/* ---------- Fonts ---------- */
+export const fonts = {
+  heading: 'MedievalSharp_400Regular',
+  body: 'MedievalSharp_400Regular',
+};
+
+/* ---------- Login / Register screens (mobile) ---------- */
+export const auth = {
+  plate: '#a8672a',
+  plateBorder: '#3a3d47',
+  plateText: '#f0d9a8',
+  panel: '#d3b574',
+  inputOnPanel: '#e4dabc',
+  inputGold: '#d9b24f',
+  inputGoldText: '#f6ecd0',
+  buttonLime: '#c9d04a',
+  buttonGold: '#d9b24f',
+  text: '#2b1d17',
+  link: '#1fb5a3',
+};
+
+/* ---------- Admin panel (desktop web) ---------- */
+export const admin = {
+  sidebar: colors.darkBrown,
+  sidebarWidth: 240,
+  background: '#f5efe3',
+  surface: '#ffffff',
+  border: '#d9cfb8',
+  text: '#2b1d17',
+  accent: colors.gold,
+  contentMaxWidth: 1100,
+};
+
+/* ---------- Template leftovers: delete once unused ---------- */
 export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
+  ios: { sans: 'system-ui', serif: 'ui-serif', rounded: 'ui-rounded', mono: 'ui-monospace' },
+  default: { sans: 'normal', serif: 'serif', rounded: 'normal', mono: 'monospace' },
   web: {
     sans: 'var(--font-display)',
     serif: 'var(--font-serif)',
@@ -46,13 +63,7 @@ export const Fonts = Platform.select({
 });
 
 export const Spacing = {
-  half: 2,
-  one: 4,
-  two: 8,
-  three: 16,
-  four: 24,
-  five: 32,
-  six: 64,
+  half: 2, one: 4, two: 8, three: 16, four: 24, five: 32, six: 64,
 } as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;

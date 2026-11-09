@@ -1,3 +1,4 @@
+import { MedievalSharp_400Regular, useFonts } from '@expo-google-fonts/medievalsharp';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
@@ -33,6 +34,9 @@ function Guard() {
 }
 
 export default function RootLayout() {
+  const [loaded] = useFonts({ MedievalSharp_400Regular });
+  if (!loaded) return null;
+
   return (
     <AuthProvider>
       <Guard />
