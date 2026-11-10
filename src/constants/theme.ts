@@ -56,6 +56,8 @@ export const ui = {
   toggleOff: '#8d8d8d',
   toggleOn: '#c9d04a',
   divider: '#2b1d17',
+  shelfBand: '#7a3f46',
+  coinPill: '#4a2a1e',
 };
 
 /* ---------- Admin panel (desktop web) ---------- */

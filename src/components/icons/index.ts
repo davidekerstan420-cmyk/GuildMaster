@@ -21,3 +21,14 @@ export const backIcon = {
   idle: require('./backarrow-icon.png'),
   pressed: require('./backarrowpressed-icon.png'),
 };
+
+export const cardIcons = {
+  edit: require('./edit.png'),
+  swords: require('./swords.png'),
+  coins: require('./coins.png'),
+};
+
+export const bazaarArt = {
+  merchant: require('./merch.png'),
+  card: require('./bazaaritem-icon.png'),
+};
