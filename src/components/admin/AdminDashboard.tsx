@@ -54,7 +54,52 @@ const categories = [
   { name: 'Mindfulness', value: '15%', color: '#6793bb' },
   { name: 'Other', value: '8%', color: '#aaa6a0' },
 ];
-type AdminHref = '/admin' | '/admin/users' | '/admin/analytics' | '/admin/shop';
+type AdminHref =
+  | '/admin'
+  | '/admin/users'
+  | '/admin/analytics'
+  | '/admin/achievements'
+  | '/admin/shop';
+
+type Achievement = {
+  id: string;
+  icon: string;
+  title: string;
+  criteria: string;
+};
+
+const initialAchievements: Achievement[] = [
+  {
+    id: 'ACH-001',
+    icon: '⚔',
+    title: 'First quest',
+    criteria: 'Complete your first quest',
+  },
+  {
+    id: 'ACH-002',
+    icon: '♨',
+    title: 'Kindled flame',
+    criteria: 'Reach a 3 day habit streak',
+  },
+  {
+    id: 'ACH-003',
+    icon: '▤',
+    title: 'Eager scholar',
+    criteria: 'Complete a study habit',
+  },
+  {
+    id: 'ACH-004',
+    icon: '⚔',
+    title: 'Quest knight',
+    criteria: 'Complete 10 quests',
+  },
+  {
+    id: 'ACH-005',
+    icon: '♨',
+    title: 'Steadfast soul',
+    criteria: 'Reach a 7 day streak',
+  },
+];
 
 function Arrow({ direction = 'right' }: { direction?: 'right' | 'down' }) {
   return <span aria-hidden="true">{direction === 'right' ? '→' : '⌄'}</span>;
@@ -687,6 +732,223 @@ export function AnalyticsPage() {
         </div>
         <ActivityChart compact />
       </article>
+    </div>
+  );
+}
+
+export function AchievementsPage() {
+  const [achievements, setAchievements] = useState(initialAchievements);
+  const [search, setSearch] = useState('');
+  const [editing, setEditing] = useState<Achievement | null>(null);
+  const [notice, setNotice] = useState('');
+
+  const visibleAchievements = achievements.filter((achievement) =>
+    `${achievement.title} ${achievement.criteria}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+
+  function saveAchievement() {
+    if (!editing) return;
+    if (!editing.title.trim() || !editing.criteria.trim()) {
+      setNotice('Add a title and unlock criteria before saving.');
+      return;
+    }
+    setAchievements((current) =>
+      current.some((achievement) => achievement.id === editing.id)
+        ? current.map((achievement) =>
+            achievement.id === editing.id ? editing : achievement
+          )
+        : [...current, editing]
+    );
+    setEditing(null);
+    setNotice(
+      'Achievement saved for this browser session. Connect an achievements table to persist changes.'
+    );
+  }
+
+  function deleteAchievement(id: string) {
+    setAchievements((current) =>
+      current.filter((achievement) => achievement.id !== id)
+    );
+    setNotice('Achievement removed from this browser session.');
+  }
+
+  return (
+    <div className="dashboard-page achievements-page">
+      <PageHeading
+        eyebrow="GuildMaster admin"
+        title="Achievement manager"
+        description="Create and manage the milestones adventurers can earn."
+      >
+        <button
+          className="button button-primary"
+          onClick={() =>
+            setEditing({
+              id: `ACH-${String(achievements.length + 1).padStart(3, '0')}`,
+              icon: '✦',
+              title: '',
+              criteria: '',
+            })
+          }
+        >
+          <span aria-hidden="true">＋</span> Add New Achievement
+        </button>
+      </PageHeading>
+      {notice ? (
+        <div className="inline-notice" role="status">
+          {notice}
+        </div>
+      ) : null}
+      <section className="panel achievement-toolbar">
+        <label className="search-field">
+          <span aria-hidden="true">⌕</span>
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search achievements by title or criteria"
+            aria-label="Search achievements"
+          />
+        </label>
+        <span className="achievement-count">
+          {visibleAchievements.length} achievement
+          {visibleAchievements.length === 1 ? '' : 's'}
+        </span>
+      </section>
+      <section className="panel achievement-table-panel">
+        <div className="table-scroll">
+          <table className="achievement-table">
+            <thead>
+              <tr>
+                <th>Icon</th>
+                <th>Title</th>
+                <th>Unlock criteria</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleAchievements.map((achievement) => (
+                <tr key={achievement.id}>
+                  <td>
+                    <span className="achievement-icon">{achievement.icon}</span>
+                  </td>
+                  <td>
+                    <div className="achievement-title">
+                      <strong>{achievement.title}</strong>
+                      <small>{achievement.id}</small>
+                    </div>
+                  </td>
+                  <td>{achievement.criteria}</td>
+                  <td>
+                    <div className="achievement-actions">
+                      <button
+                        className="button button-small button-edit"
+                        onClick={() => {
+                          setEditing(achievement);
+                          setNotice('');
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="button button-small button-delete"
+                        onClick={() => deleteAchievement(achievement.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {visibleAchievements.length === 0 ? (
+                <tr>
+                  <td className="table-message" colSpan={4}>
+                    No achievements match your search.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+        <div className="table-footer">
+          <span>Showing all {visibleAchievements.length} achievements</span>
+          <span>Page 1 of 1</span>
+        </div>
+      </section>
+      {editing ? (
+        <div
+          className="modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setEditing(null);
+          }}
+        >
+          <section
+            className="modal-card achievement-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="achievement-editor-title"
+          >
+            <button
+              className="modal-close"
+              aria-label="Close dialog"
+              onClick={() => setEditing(null)}
+            >
+              ×
+            </button>
+            <div className="eyebrow">
+              {editing.title ? 'Edit achievement' : 'New achievement'}
+            </div>
+            <h2 id="achievement-editor-title">
+              {editing.title || 'Add an achievement'}
+            </h2>
+            <label className="form-field">
+              Icon
+              <input
+                value={editing.icon}
+                maxLength={2}
+                onChange={(event) =>
+                  setEditing({ ...editing, icon: event.target.value })
+                }
+              />
+            </label>
+            <label className="form-field">
+              Title
+              <input
+                value={editing.title}
+                onChange={(event) =>
+                  setEditing({ ...editing, title: event.target.value })
+                }
+                autoFocus
+              />
+            </label>
+            <label className="form-field">
+              Unlock criteria
+              <textarea
+                rows={3}
+                value={editing.criteria}
+                onChange={(event) =>
+                  setEditing({ ...editing, criteria: event.target.value })
+                }
+              />
+            </label>
+            <div className="modal-actions">
+              <button
+                className="button button-secondary"
+                onClick={() => setEditing(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="button button-primary"
+                onClick={saveAchievement}
+              >
+                Save achievement
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 }

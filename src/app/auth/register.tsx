@@ -21,10 +21,13 @@ export default function Register() {
 
   const onRegister = async () => {
     setMessage('');
-    if (!name.trim() || !email.trim()) return setMessage('Please fill in your name and email.');
+    if (!name.trim() || !email.trim())
+      return setMessage('Please fill in your name and email.');
     const ageNum = parseInt(age, 10);
-    if (!ageNum || ageNum < 1 || ageNum > 120) return setMessage('Please enter a valid age.');
-    if (password.length < 6) return setMessage('Watchword must be at least 6 characters.');
+    if (!ageNum || ageNum < 1 || ageNum > 120)
+      return setMessage('Please enter a valid age.');
+    if (password.length < 6)
+      return setMessage('Watchword must be at least 6 characters.');
 
     setBusy(true);
     const { error } = await supabase.auth.signUp({
@@ -35,7 +38,9 @@ export default function Register() {
     setBusy(false);
 
     setMessage(
-      error ? error.message : 'Account created! Check your email if confirmation is enabled.'
+      error
+        ? error.message
+        : 'Account created! Check your email if confirmation is enabled.'
     );
   };
 
@@ -48,7 +53,7 @@ export default function Register() {
       <TitlePlate title={'WELCOME TO\nGUILDMASTER!'} />
 
       <View style={styles.panel}>
-        <Text style={styles.label}>Adventurer's name</Text>
+        <Text style={styles.label}>Adventurer&apos;s name</Text>
         <TextInput style={styles.input} value={name} onChangeText={setName} />
 
         <Text style={styles.label}>Age</Text>
@@ -90,10 +95,16 @@ export default function Register() {
       <View style={styles.social}>
         <Text style={styles.or}>or register with</Text>
         <View style={styles.socialRow}>
-          <Pressable style={styles.socialBtn} onPress={() => setMessage('Facebook sign-in coming soon.')}>
+          <Pressable
+            style={styles.socialBtn}
+            onPress={() => setMessage('Facebook sign-in coming soon.')}
+          >
             <FacebookIcon width={44} height={44} />
           </Pressable>
-          <Pressable style={styles.socialBtn} onPress={() => setMessage('Google sign-in coming soon.')}>
+          <Pressable
+            style={styles.socialBtn}
+            onPress={() => setMessage('Google sign-in coming soon.')}
+          >
             <GoogleIcon width={44} height={44} />
           </Pressable>
         </View>
@@ -117,7 +128,13 @@ const styles = StyleSheet.create({
     padding: 14,
     marginTop: 20,
   },
-  label: { fontFamily: fonts.body, fontSize: 16, color: auth.text, marginTop: 8, marginBottom: 4 },
+  label: {
+    fontFamily: fonts.body,
+    fontSize: 16,
+    color: auth.text,
+    marginTop: 8,
+    marginBottom: 4,
+  },
   input: {
     backgroundColor: auth.inputOnPanel,
     borderRadius: 12,

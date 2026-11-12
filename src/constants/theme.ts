@@ -14,6 +14,25 @@ export const colors = {
   danger: '#b3261e',
 };
 
+export const Colors = {
+  light: {
+    text: '#2b1d17',
+    textSecondary: '#6f6259',
+    background: '#f5efe3',
+    backgroundElement: '#ffffff',
+    backgroundSelected: '#eadfc9',
+  },
+  dark: {
+    text: '#f6ecd0',
+    textSecondary: '#d8cbb1',
+    background: '#2b211b',
+    backgroundElement: '#3b2a24',
+    backgroundSelected: '#5a4331',
+  },
+} as const;
+
+export type ThemeColor = keyof (typeof Colors)['light'];
+
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 };
 export const radius = { sm: 8, md: 12, lg: 20 };
 
@@ -74,8 +93,18 @@ export const admin = {
 
 /* ---------- Template leftovers: delete once unused ---------- */
 export const Fonts = Platform.select({
-  ios: { sans: 'system-ui', serif: 'ui-serif', rounded: 'ui-rounded', mono: 'ui-monospace' },
-  default: { sans: 'normal', serif: 'serif', rounded: 'normal', mono: 'monospace' },
+  ios: {
+    sans: 'system-ui',
+    serif: 'ui-serif',
+    rounded: 'ui-rounded',
+    mono: 'ui-monospace',
+  },
+  default: {
+    sans: 'normal',
+    serif: 'serif',
+    rounded: 'normal',
+    mono: 'monospace',
+  },
   web: {
     sans: 'var(--font-display)',
     serif: 'var(--font-serif)',
@@ -85,7 +114,13 @@ export const Fonts = Platform.select({
 });
 
 export const Spacing = {
-  half: 2, one: 4, two: 8, three: 16, four: 24, five: 32, six: 64,
+  half: 2,
+  one: 4,
+  two: 8,
+  three: 16,
+  four: 24,
+  five: 32,
+  six: 64,
 } as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;

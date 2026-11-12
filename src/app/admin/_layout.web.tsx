@@ -9,6 +9,7 @@ const navigation = [
   { href: '/admin', label: 'Overview', icon: '▦' },
   { href: '/admin/users', label: 'Accounts', icon: '♙', badge: '2' },
   { href: '/admin/analytics', label: 'Analytics', icon: '⌁' },
+  { href: '/admin/achievements', label: 'Achievements', icon: '✦' },
   { href: '/admin/shop', label: 'Shop', icon: '▣' },
 ] as const;
 

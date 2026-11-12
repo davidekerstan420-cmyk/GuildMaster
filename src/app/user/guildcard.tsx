@@ -1,5 +1,13 @@
-import { useEffect, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ScreenHeader from '../../components/ScreenHeader';
 import { cardIcons } from '../../components/icons';
@@ -21,7 +29,15 @@ type FieldProps = {
   keyboardType?: 'default' | 'number-pad' | 'email-address';
 };
 
-function Field({ label, value, onChange, editable, secure, placeholder, keyboardType }: FieldProps) {
+function Field({
+  label,
+  value,
+  onChange,
+  editable,
+  secure,
+  placeholder,
+  keyboardType,
+}: FieldProps) {
   return (
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
@@ -52,23 +68,31 @@ export default function GuildCardScreen() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
 
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     if (!userId) return;
-    const { data } = await supabase.from('profiles').select('name, age').eq('id', userId).single();
+    const { data } = await supabase
+      .from('profiles')
+      .select('name, age')
+      .eq('id', userId)
+      .single();
     setName(data?.name ?? '');
     setAge(data?.age != null ? String(data.age) : '');
-  };
+  }, [userId]);
 
   useEffect(() => {
-    loadProfile();
-  }, [userId]);
+    // Profile hydration intentionally updates form state after the session is available.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadProfile();
+  }, [loadProfile]);
 
   const onSave = async () => {
     setMessage('');
     const ageNum = parseInt(age, 10);
     if (!name.trim()) return setMessage('Name cannot be empty.');
-    if (!ageNum || ageNum < 1 || ageNum > 120) return setMessage('Please enter a valid age.');
-    if (password && password.length < 6) return setMessage('Watchword must be at least 6 characters.');
+    if (!ageNum || ageNum < 1 || ageNum > 120)
+      return setMessage('Please enter a valid age.');
+    if (password && password.length < 6)
+      return setMessage('Watchword must be at least 6 characters.');
 
     setSaving(true);
     const { error } = await supabase
@@ -98,35 +122,73 @@ export default function GuildCardScreen() {
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
         <ScreenHeader title="MY GUILD CARD" />
 
         <View style={styles.topRow}>
           <View style={styles.avatar}>
             {/* TODO: render the equipped character here */}
-            <Pressable style={styles.avatarEdit} hitSlop={8} onPress={() => setMessage('Character customization coming soon.')}>
-              <Image source={cardIcons.edit} style={styles.editIcon} resizeMode="contain" />
+            <Pressable
+              style={styles.avatarEdit}
+              hitSlop={8}
+              onPress={() => setMessage('Character customization coming soon.')}
+            >
+              <Image
+                source={cardIcons.edit}
+                style={styles.editIcon}
+                resizeMode="contain"
+              />
             </Pressable>
           </View>
 
           <View style={styles.stats}>
             <View style={styles.statRow}>
-              <Image source={cardIcons.swords} style={styles.statIcon} resizeMode="contain" />
+              <Image
+                source={cardIcons.swords}
+                style={styles.statIcon}
+                resizeMode="contain"
+              />
               <Text style={styles.statText}>LEVEL {LEVEL}</Text>
             </View>
             <View style={styles.statRow}>
-              <Image source={cardIcons.coins} style={styles.statIcon} resizeMode="contain" />
+              <Image
+                source={cardIcons.coins}
+                style={styles.statIcon}
+                resizeMode="contain"
+              />
               <Text style={styles.statText}>{POINTS}</Text>
             </View>
           </View>
         </View>
 
-        <Pressable style={styles.formEdit} hitSlop={8} onPress={() => (editing ? onCancel() : setEditing(true))}>
-          <Image source={cardIcons.edit} style={styles.editIcon} resizeMode="contain" />
+        <Pressable
+          style={styles.formEdit}
+          hitSlop={8}
+          onPress={() => (editing ? onCancel() : setEditing(true))}
+        >
+          <Image
+            source={cardIcons.edit}
+            style={styles.editIcon}
+            resizeMode="contain"
+          />
         </Pressable>
 
-        <Field label="Name" value={name} onChange={setName} editable={editing} />
-        <Field label="Age" value={age} onChange={setAge} editable={editing} keyboardType="number-pad" />
+        <Field
+          label="Name"
+          value={name}
+          onChange={setName}
+          editable={editing}
+        />
+        <Field
+          label="Age"
+          value={age}
+          onChange={setAge}
+          editable={editing}
+          keyboardType="number-pad"
+        />
         <Field label="Email" value={email} editable={false} />
         <Field
           label="Watchword"
@@ -141,7 +203,11 @@ export default function GuildCardScreen() {
 
         {editing && (
           <View style={styles.actions}>
-            <Pressable style={[styles.btn, styles.btnSave]} onPress={onSave} disabled={saving}>
+            <Pressable
+              style={[styles.btn, styles.btnSave]}
+              onPress={onSave}
+              disabled={saving}
+            >
               <Text style={styles.btnText}>{saving ? '...' : 'Save'}</Text>
             </Pressable>
             <Pressable style={styles.btn} onPress={onCancel}>
@@ -175,7 +241,12 @@ const styles = StyleSheet.create({
   formEdit: { alignSelf: 'flex-end', marginTop: 16 },
 
   field: { gap: 2, marginTop: 4 },
-  label: { fontFamily: fonts.body, fontSize: 16, color: ui.text, marginLeft: 6 },
+  label: {
+    fontFamily: fonts.body,
+    fontSize: 16,
+    color: ui.text,
+    marginLeft: 6,
+  },
   pill: {
     backgroundColor: ui.banner,
     borderRadius: 14,
@@ -188,9 +259,24 @@ const styles = StyleSheet.create({
   },
   pillEditing: { borderWidth: 2, borderColor: ui.button },
 
-  message: { fontFamily: fonts.body, fontSize: 14, color: ui.text, marginTop: 8 },
-  actions: { flexDirection: 'row', gap: 12, justifyContent: 'center', marginTop: 12 },
-  btn: { backgroundColor: ui.banner, paddingVertical: 10, paddingHorizontal: 24, borderRadius: 20 },
+  message: {
+    fontFamily: fonts.body,
+    fontSize: 14,
+    color: ui.text,
+    marginTop: 8,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'center',
+    marginTop: 12,
+  },
+  btn: {
+    backgroundColor: ui.banner,
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+    borderRadius: 20,
+  },
   btnSave: { backgroundColor: ui.tabActive },
   btnText: { fontFamily: fonts.body, fontSize: 16, color: ui.text },
 

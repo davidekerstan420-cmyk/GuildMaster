@@ -1,4 +1,7 @@
-import { MedievalSharp_400Regular, useFonts } from '@expo-google-fonts/medievalsharp';
+import {
+  MedievalSharp_400Regular,
+  useFonts,
+} from '@expo-google-fonts/medievalsharp';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
@@ -21,7 +24,7 @@ function Guard() {
 
     if (role === 'admin' && area !== 'admin') router.replace('/admin');
     if (role === 'user' && area !== 'user') router.replace('/user');
-  }, [session, role, loading, segments]);
+  }, [session, role, loading, router, segments]);
 
   if (loading) {
     return (
