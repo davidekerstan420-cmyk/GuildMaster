@@ -451,6 +451,11 @@ body.admin-dashboard-body {
 .button-primary:hover {
   background: #7e4c12;
 }
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
 .button-secondary {
   border-color: var(--admin-border);
   color: #63584d;
@@ -489,6 +494,79 @@ body.admin-dashboard-body {
   border-color: #f0d2cf;
   color: #9a332c;
   background: #fff3f1;
+}
+.notification-composer,
+.notification-history {
+  padding: 18px;
+}
+.notification-composer {
+  display: grid;
+  gap: 18px;
+}
+.notification-composer .form-field {
+  display: grid;
+  gap: 7px;
+  color: #66594d;
+  font-size: 10px;
+  font-weight: 600;
+}
+.notification-composer textarea {
+  width: 100%;
+  min-height: 170px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid var(--admin-border);
+  border-radius: 7px;
+  outline: 0;
+  color: var(--admin-ink);
+  background: #fff;
+  line-height: 1.5;
+}
+.notification-composer textarea:focus {
+  border-color: #c79343;
+  box-shadow: 0 0 0 3px rgb(199 147 67 / 12%);
+}
+.notification-composer textarea::placeholder {
+  color: #aaa097;
+}
+.notification-composer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.notification-history {
+  display: grid;
+  gap: 14px;
+}
+.notification-history-list {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+}
+.notification-history-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px;
+  background: #fff;
+}
+.notification-history-item + .notification-history-item {
+  border-top: 1px solid var(--admin-border);
+}
+.notification-history-item p {
+  margin: 0 0 6px;
+  color: var(--admin-ink);
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.notification-history-item time {
+  color: var(--admin-muted);
+  font-size: 10px;
 }
 .metric-grid {
   display: grid;
@@ -1450,6 +1528,13 @@ body.admin-dashboard-body {
   }
   .table-footer {
     gap: 8px;
+  }
+  .notification-composer-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .notification-composer-footer .button {
+    width: 100%;
   }
 }
 

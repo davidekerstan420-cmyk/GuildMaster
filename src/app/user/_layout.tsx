@@ -7,12 +7,16 @@ export default function UserLayout() {
   if (role !== 'user') return <Redirect href="/" />;
 
   return (
-    <Tabs tabBar={(props) => <UserTabBar {...props} />} screenOptions={{ headerShown: false }}>
+    <Tabs
+      tabBar={(props) => <UserTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
+    >
       <Tabs.Screen name="index" options={{ href: null }} />
       <Tabs.Screen name="quest" />
       <Tabs.Screen name="habit" />
       <Tabs.Screen name="bazaar" />
       <Tabs.Screen name="guildcard" />
+      <Tabs.Screen name="notifications" />
     </Tabs>
   );
 }

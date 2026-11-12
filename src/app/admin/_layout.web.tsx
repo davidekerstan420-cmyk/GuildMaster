@@ -11,6 +11,7 @@ const navigation = [
   { href: '/admin/analytics', label: 'Analytics', icon: '⌁' },
   { href: '/admin/achievements', label: 'Achievements', icon: '✦' },
   { href: '/admin/shop', label: 'Shop', icon: '▣' },
+  { href: '/admin/notifications', label: 'Notifications', icon: '♧' },
 ] as const;
 
 type AdminHref = (typeof navigation)[number]['href'];

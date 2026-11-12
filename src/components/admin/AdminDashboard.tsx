@@ -59,7 +59,8 @@ type AdminHref =
   | '/admin/users'
   | '/admin/analytics'
   | '/admin/achievements'
-  | '/admin/shop';
+  | '/admin/shop'
+  | '/admin/notifications';
 
 type Achievement = {
   id: string;
