@@ -1,9 +1,10 @@
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import AuthBackground from '../../components/AuthBackground';
-import GameButton from '../../components/GameButton';
-import TitlePlate from '../../components/TitlePlate';
+import BrandLogo from '../../components/BrandLogo';
+import PixelButton from '../../components/PixelButton';
+import PixelInput from '../../components/PixelInput';
 import { auth, fonts } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
@@ -27,66 +28,47 @@ export default function Login() {
   return (
     <AuthBackground>
       <View style={styles.top}>
-        <TitlePlate title="GUILDMASTER" />
+        <BrandLogo width={320} />
       </View>
 
       <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor={auth.inputGoldText}
-          autoCapitalize="none"
+        <PixelInput
+          placeholder="Email address"
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
         />
-        <TextInput
-          style={styles.input}
+        <PixelInput
           placeholder="Password"
-          placeholderTextColor={auth.inputGoldText}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
         />
         {!!error && <Text style={styles.error}>{error}</Text>}
 
-        <View style={styles.row}>
-          <Link href="/auth/register" style={styles.link}>
-            SIGN UP?
-          </Link>
-          <GameButton
-            label={busy ? '...' : 'Login'}
-            onPress={onLogin}
-            color={auth.buttonLime}
-            disabled={busy}
-          />
-        </View>
+        <PixelButton
+          label={busy ? '...' : 'Login'}
+          onPress={onLogin}
+          disabled={busy}
+          width={130}
+          style={styles.loginBtn}
+        />
+
+        <Link href="/auth/register" style={styles.link}>
+          SIGN UP?
+        </Link>
       </View>
     </AuthBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  top: { marginTop: 40 },
+  top: { marginTop: 24 },
   form: { flex: 1, justifyContent: 'flex-end', gap: 16, paddingBottom: 24 },
-  input: {
-    backgroundColor: auth.inputGold,
-    borderRadius: 20,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    fontFamily: fonts.body,
-    fontSize: 16,
-    color: auth.text,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  link: { fontFamily: fonts.body, color: auth.link, fontSize: 14 },
+  loginBtn: { alignSelf: 'flex-end', marginTop: 8 },
+  link: { fontFamily: fonts.body, fontSize: 14, color: auth.linkYellow, marginTop: 24 },
   error: {
-    backgroundColor: '#fff3',
+    backgroundColor: '#fff8',
     color: '#8a1c14',
     padding: 8,
     borderRadius: 8,

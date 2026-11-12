@@ -32,3 +32,23 @@ export const bazaarArt = {
   merchant: require('./merch.png'),
   card: require('./bazaaritem-icon.png'),
 };
+
+export const socialIcons = {
+  facebook: {
+    idle: require('./fb-icon.png'),
+    pressed: require('./fbpressed-icon.png'),
+  },
+  google: {
+    idle: require('./google-icon.png'),
+    pressed: require('./googlepressed-icon.png'),
+  },
+};
+
+export const buttonArt = {
+  primary: require('./login_register-button.png'),
+};
+
+export const brandArt = {
+  logo: require('./Guildmaster-logo.png'),
+  textbox: require('./textbox_1.png'),
+};

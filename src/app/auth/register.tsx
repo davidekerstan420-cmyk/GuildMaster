@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import FacebookIcon from '../../../assets/images/icon-facebook.svg';
-import GoogleIcon from '../../../assets/images/icon-google.svg';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import AuthBackground from '../../components/AuthBackground';
-import GameButton from '../../components/GameButton';
+import BrandLogo from '../../components/BrandLogo';
+import { socialIcons } from '../../components/icons';
+import PixelButton from '../../components/PixelButton';
+import PixelInput from '../../components/PixelInput';
 import TitlePlate from '../../components/TitlePlate';
 import { auth, fonts } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
@@ -46,40 +47,24 @@ export default function Register() {
       </Pressable>
 
       <TitlePlate title={'WELCOME TO\nGUILDMASTER!'} />
+      <BrandLogo width={260} />
 
       <View style={styles.panel}>
         <Text style={styles.label}>Adventurer's name</Text>
-        <TextInput style={styles.input} value={name} onChangeText={setName} />
+        <PixelInput value={name} onChangeText={setName} />
 
         <Text style={styles.label}>Age</Text>
-        <TextInput
-          style={styles.input}
-          value={age}
-          onChangeText={setAge}
-          keyboardType="number-pad"
-          maxLength={3}
-        />
+        <PixelInput value={age} onChangeText={setAge} keyboardType="number-pad" maxLength={3} />
 
         <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
+        <PixelInput value={email} onChangeText={setEmail} keyboardType="email-address" />
 
         <Text style={styles.label}>Your watchword</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+        <PixelInput value={password} onChangeText={setPassword} secureTextEntry />
 
         {!!message && <Text style={styles.message}>{message}</Text>}
 
-        <GameButton
+        <PixelButton
           label={busy ? '...' : 'REGISTER'}
           onPress={onRegister}
           disabled={busy}
@@ -90,13 +75,25 @@ export default function Register() {
       <View style={styles.social}>
         <Text style={styles.or}>or register with</Text>
         <View style={styles.socialRow}>
-          <Pressable style={styles.socialBtn} onPress={() => setMessage('Facebook sign-in coming soon.')}>
-            <FacebookIcon width={44} height={44} />
-          </Pressable>
-          <Pressable style={styles.socialBtn} onPress={() => setMessage('Google sign-in coming soon.')}>
-            <GoogleIcon width={44} height={44} />
-          </Pressable>
-        </View>
+        <Pressable onPress={() => setMessage('Facebook sign-in coming soon.')}>
+          {({ pressed }) => (
+            <Image
+              source={pressed ? socialIcons.facebook.pressed : socialIcons.facebook.idle}
+              style={styles.socialIcon}
+              resizeMode="contain"
+            />
+          )}
+        </Pressable>
+        <Pressable onPress={() => setMessage('Google sign-in coming soon.')}>
+          {({ pressed }) => (
+            <Image
+              source={pressed ? socialIcons.google.pressed : socialIcons.google.idle}
+              style={styles.socialIcon}
+              resizeMode="contain"
+            />
+          )}
+        </Pressable>
+      </View>
       </View>
     </AuthBackground>
   );
@@ -131,10 +128,6 @@ const styles = StyleSheet.create({
   social: { alignItems: 'center', marginTop: 28, gap: 14 },
   or: { fontFamily: fonts.body, fontSize: 15, color: auth.text },
   socialRow: { flexDirection: 'row', gap: 36 },
-  socialBtn: {
-    backgroundColor: auth.buttonGold,
-    borderRadius: 14,
-    padding: 10,
-  },
+  socialIcon: { width: 80, height: 80 },
   icon: { width: 44, height: 44, resizeMode: 'contain' },
 });
