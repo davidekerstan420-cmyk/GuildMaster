@@ -5,9 +5,10 @@ import { backIcon } from './icons';
 export default function BackButton({ onPress }: { onPress?: () => void }) {
   const router = useRouter();
   const handle = () => {
-    if (onPress) onPress();
-    else if (router.canGoBack()) router.back();
-  };
+  if (onPress) onPress();
+  else if (router.canGoBack()) router.back();
+  else router.replace('/user');
+};
 
   return (
     <Pressable onPress={handle} hitSlop={10}>

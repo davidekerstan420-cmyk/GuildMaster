@@ -13,6 +13,9 @@ export default function UserLayout() {
       <Tabs.Screen name="habit" />
       <Tabs.Screen name="bazaar" />
       <Tabs.Screen name="guildcard" />
+      <Tabs.Screen name="notice" options={{ href: null }} />
+      <Tabs.Screen name="achievement" options={{ href: null }} />
+      <Tabs.Screen name="settings" options={{ href: null }} />
     </Tabs>
   );
 }

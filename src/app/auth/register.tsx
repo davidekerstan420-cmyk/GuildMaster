@@ -7,7 +7,6 @@ import BrandLogo from '../../components/BrandLogo';
 import { socialIcons } from '../../components/icons';
 import PixelButton from '../../components/PixelButton';
 import PixelInput from '../../components/PixelInput';
-import TitlePlate from '../../components/TitlePlate';
 import { auth, fonts } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 
@@ -46,7 +45,6 @@ export default function Register() {
         <Ionicons name="arrow-back" size={22} color={auth.plateText} />
       </Pressable>
 
-      <TitlePlate title={'WELCOME TO\nGUILDMASTER!'} />
       <BrandLogo width={260} />
 
       <View style={styles.panel}>
@@ -126,7 +124,14 @@ const styles = StyleSheet.create({
   },
   message: { fontFamily: fonts.body, color: '#8a1c14', marginTop: 10 },
   social: { alignItems: 'center', marginTop: 28, gap: 14 },
-  or: { fontFamily: fonts.body, fontSize: 15, color: auth.text },
+  or: {
+  fontFamily: fonts.body,
+  fontSize: 15,
+  color: auth.linkYellow,
+  textShadowColor: '#000',
+  textShadowOffset: { width: 0, height: 1 },
+  textShadowRadius: 3,
+      },
   socialRow: { flexDirection: 'row', gap: 36 },
   socialIcon: { width: 80, height: 80 },
   icon: { width: 44, height: 44, resizeMode: 'contain' },

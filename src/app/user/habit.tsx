@@ -1,57 +1,90 @@
-import { useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AddItemModal, { NewItem } from '../../components/AddItemModal';
+import FilterModal, { CategoryFilter } from '../../components/FilterModal';
+import { HabitIconKey, badgeIcons, habitIcons, noticeArt, questArt } from '../../components/icons';
 import ScreenHeader from '../../components/ScreenHeader';
+import { CATEGORY_ICON } from '../../constants/categories';
 import { fonts, ui } from '../../constants/theme';
+import { useGame } from '../../context/GameContext';
+import { supabase } from '../../lib/supabase';
 
-type Habit = { id: string; title: string; icon: string; done: boolean };
-
-// Placeholder glyphs. Swap for your Figma SVG icons later (see notes).
-const ICONS = ['☀', '🛡', '📖'];
-
-// Sample data only. We'll replace this with Supabase later.
-const initial: Habit[] = [
-  { id: '1', title: '20 minute exercise', icon: '☀', done: false },
-  { id: '2', title: 'Morning prayer', icon: '☀', done: false },
-  { id: '3', title: 'Drink 8 cups of water minimum', icon: '🛡', done: false },
-  { id: '4', title: 'Study lessons', icon: '📖', done: false },
-];
-
-// Streak as of yesterday. Later this comes from Habit.current_streak / longest_streak.
-const BASE_STREAK = 2;
-const BASE_BEST = 5;
+type Habit = {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  icon: HabitIconKey;
+  done: boolean;
+};
 
 export default function HabitScreen() {
-  const [habits, setHabits] = useState<Habit[]>(initial);
-  const [adding, setAdding] = useState(false);
-  const [draft, setDraft] = useState('');
+  const { profile, refresh: refreshGame } = useGame();
+  const [habits, setHabits] = useState<Habit[]>([]);
+  const [error, setError] = useState('');
   const [deleteMode, setDeleteMode] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('All');
+  const [pendingFirst, setPendingFirst] = useState(false);
 
-  // The streak grows by 1 for today only while every habit is done.
-  const allDone = habits.length > 0 && habits.every((h) => h.done);
-  const streak = BASE_STREAK + (allDone ? 1 : 0);
-  const best = Math.max(BASE_BEST, streak);
+  const streak = profile?.currentStreak ?? 0;
+  const best = profile?.bestStreak ?? 0;
 
-  const toggle = (id: string) =>
-    setHabits((prev) => prev.map((h) => (h.id === id ? { ...h, done: !h.done } : h)));
+  const load = useCallback(async () => {
+    const { data, error } = await supabase.rpc('get_habits_today');
+    if (error) return setError(error.message);
+    setError('');
+    setHabits((data ?? []) as Habit[]);
+  }, []);
 
-  const remove = (id: string) => setHabits((prev) => prev.filter((h) => h.id !== id));
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load])
+  );
 
-  const addHabit = () => {
-    const title = draft.trim();
-    if (!title) return;
-    setHabits((prev) => [
-      ...prev,
-      { id: String(Date.now()), title, icon: ICONS[prev.length % ICONS.length], done: false },
-    ]);
-    setDraft('');
-    setAdding(false);
+  const filtered = habits.filter((h) => categoryFilter === 'All' || h.category === categoryFilter);
+  const visible = pendingFirst
+    ? [...filtered].sort((a, b) => Number(a.done) - Number(b.done))
+    : filtered;
+
+  // One-way for today: the server awards XP once per habit per day.
+  const complete = async (id: string) => {
+    const h = habits.find((x) => x.id === id);
+    if (!h || h.done) return;
+    setHabits((prev) => prev.map((x) => (x.id === id ? { ...x, done: true } : x)));
+    const { error } = await supabase.rpc('complete_habit', { p_id: id });
+    if (error) setError(error.message);
+    else setError('');
+    await load();
+    refreshGame();
+  };
+
+  const remove = async (id: string) => {
+    setHabits((prev) => prev.filter((h) => h.id !== id));
+    const { error } = await supabase.from('habits').delete().eq('id', id);
+    if (error) setError(error.message);
+    load();
+  };
+
+  const addHabit = async (item: NewItem) => {
+    const { error } = await supabase.from('habits').insert({
+      title: item.title,
+      description: item.description,
+      category: item.category,
+      icon: CATEGORY_ICON[item.category],
+    });
+    if (error) setError(error.message);
+    load();
   };
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
       <FlatList
-        data={habits}
+        data={visible}
         keyExtractor={(h) => h.id}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
@@ -60,7 +93,7 @@ export default function HabitScreen() {
             <ScreenHeader title="HABIT LOG" />
 
             <View style={styles.streak}>
-              <Text style={styles.streakIcon}>🔥</Text>
+              <Image source={badgeIcons.fire} style={styles.streakIcon} resizeMode="contain" />
               <View>
                 <Text style={styles.streakTitle}>{streak} DAY HOT STREAK</Text>
                 <Text style={styles.streakBest}>best streak {best}</Text>
@@ -70,48 +103,43 @@ export default function HabitScreen() {
             <View style={styles.sectionRow}>
               <Text style={styles.sectionTitle}>Daily Habits</Text>
               <View style={styles.actions}>
-                <Pressable
-                  onPress={() => setAdding((v) => !v)}
-                  style={[styles.actionBtn, adding && styles.actionActive]}
-                >
-                  <Text style={styles.actionText}>＋</Text>
+                <Pressable onPress={() => setFilterOpen(true)} hitSlop={8}>
+                  <Image source={questArt.filter} style={styles.filterIcon} resizeMode="contain" />
+                </Pressable>
+                <Pressable onPress={() => setAddOpen(true)} style={[styles.pill, styles.pillGold]}>
+                  <Text style={styles.plus}>＋</Text>
                 </Pressable>
                 <Pressable
                   onPress={() => setDeleteMode((v) => !v)}
-                  style={[styles.actionBtn, deleteMode && styles.actionDanger]}
+                  style={[styles.pill, deleteMode && styles.pillDanger]}
                 >
-                  <Text style={styles.actionText}>🗑</Text>
+                  <Image source={noticeArt.delete} style={styles.actionIcon} resizeMode="contain" />
                 </Pressable>
               </View>
             </View>
             <View style={styles.divider} />
 
-            {adding && (
-              <View style={styles.addRow}>
-                <TextInput
-                  style={styles.addInput}
-                  placeholder="New habit..."
-                  placeholderTextColor={ui.buttonText}
-                  value={draft}
-                  onChangeText={setDraft}
-                  onSubmitEditing={addHabit}
-                  returnKeyType="done"
-                  autoFocus
-                />
-              </View>
-            )}
+            {categoryFilter !== 'All' && <Text style={styles.hint}>Showing: {categoryFilter}</Text>}
+            {!!error && <Text style={styles.hint}>{error}</Text>}
             {deleteMode && <Text style={styles.hint}>Tap a habit to delete it</Text>}
           </View>
         }
-        ListEmptyComponent={<Text style={styles.empty}>No habits yet. Tap ＋ to add one.</Text>}
+        ListEmptyComponent={<Text style={styles.empty}>No habits here yet. Tap ＋ to add one.</Text>}
         renderItem={({ item }) => (
           <Pressable
             onPress={() => deleteMode && remove(item.id)}
             style={[styles.card, deleteMode && styles.cardDelete]}
           >
-            <Text style={styles.icon}>{item.icon}</Text>
-            <Text style={styles.cardTitle}>{item.title}</Text>
-            <Pressable onPress={() => toggle(item.id)} hitSlop={10}>
+            <Image source={habitIcons[item.icon]} style={styles.icon} resizeMode="contain" />
+            <View style={styles.cardBody}>
+              <Text style={styles.cardTitle}>{item.title}</Text>
+              {!!item.description && (
+                <Text style={styles.desc} numberOfLines={1}>
+                  {item.description}
+                </Text>
+              )}
+            </View>
+            <Pressable onPress={() => complete(item.id)} hitSlop={10}>
               <View style={styles.ring}>
                 <View style={[styles.dot, item.done && styles.dotDone]} />
               </View>
@@ -119,13 +147,24 @@ export default function HabitScreen() {
           </Pressable>
         )}
       />
+
+      <AddItemModal visible={addOpen} kind="habit" onClose={() => setAddOpen(false)} onSubmit={addHabit} />
+      <FilterModal
+        visible={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        value={categoryFilter}
+        onChange={setCategoryFilter}
+        extraLabel="Pending first"
+        extraValue={pendingFirst}
+        onExtraChange={setPendingFirst}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: ui.background },
-  content: { padding: 16, paddingBottom: 24, gap: 10 },
+  content: { padding: 16, paddingBottom: 24, gap: 12 },
   headerBlock: { gap: 14, marginBottom: 4 },
 
   streak: {
@@ -137,7 +176,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
   },
-  streakIcon: { fontSize: 24 },
+  streakIcon: { width: 30, height: 30 },
   streakTitle: { fontFamily: fonts.heading, fontSize: 20, color: ui.text },
   streakBest: { fontFamily: fonts.body, fontSize: 11, color: ui.text, opacity: 0.6 },
 
@@ -148,29 +187,33 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sectionTitle: { fontFamily: fonts.body, fontSize: 20, color: ui.text },
-  actions: { flexDirection: 'row', gap: 8 },
-  actionBtn: {
-    width: 40,
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+
+  filterIcon: { width: 28, height: 28 },
+  cardBody: { flex: 1, gap: 2 },
+  desc: { fontFamily: fonts.body, fontSize: 12, color: ui.text, opacity: 0.7 },
+  pill: {
+    width: 42,
     height: 28,
     borderRadius: 14,
-    backgroundColor: ui.banner,
+    backgroundColor: ui.habitCard,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  actionActive: { backgroundColor: ui.toggleOn },
-  actionDanger: { backgroundColor: ui.danger },
-  actionText: { fontSize: 16, color: ui.text },
+  pillGold: { backgroundColor: ui.banner },
+  pillDanger: { backgroundColor: ui.danger },
+  plus: { fontSize: 18, color: '#fff', lineHeight: 20 },
+  actionIcon: { width: 16, height: 16 },
   divider: { height: 1, backgroundColor: ui.divider },
 
-  addRow: { backgroundColor: ui.button, borderRadius: 14, paddingHorizontal: 16 },
-  addInput: { fontFamily: fonts.body, fontSize: 18, color: ui.buttonText, paddingVertical: 12 },
+  
   hint: { fontFamily: fonts.body, fontSize: 14, color: ui.danger },
   empty: { fontFamily: fonts.body, fontSize: 16, color: ui.text, textAlign: 'center', marginTop: 24 },
 
   card: {
     backgroundColor: ui.habitCard,
     borderRadius: 10,
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -179,17 +222,17 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   cardDelete: { borderColor: ui.danger },
-  icon: { fontSize: 24, width: 32, textAlign: 'center', color: ui.text },
-  cardTitle: { flex: 1, fontFamily: fonts.body, fontSize: 17, color: ui.text },
+  icon: { width: 34, height: 34 },
+  cardTitle: { fontFamily: fonts.body, fontSize: 17, color: ui.text },
 
   ring: {
-    width: 30,
-    height: 24,
-    borderRadius: 12,
+    width: 32,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: ui.toggleRing,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dot: { width: 20, height: 14, borderRadius: 8, backgroundColor: ui.toggleOff },
+  dot: { width: 22, height: 16, borderRadius: 8, backgroundColor: ui.toggleOff },
   dotDone: { backgroundColor: ui.toggleOn },
 });

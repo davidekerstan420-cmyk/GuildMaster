@@ -33,17 +33,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadRole = async (s: Session | null) => {
-    if (!s) {
-      setRole(null);
-      return;
-    }
-    const { data } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', s.user.id)
-      .single();
-    setRole((data?.role as Role) ?? 'user');
-  };
+  if (!s) { setRole(null); return; }
+  const { data } = await supabase.from('profiles').select('role, status').eq('id', s.user.id).single();
+  if (data?.status === 'suspended') {
+    await supabase.auth.signOut();
+    return;
+  }
+  setRole((data?.role as Role) ?? 'user');
+};
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {

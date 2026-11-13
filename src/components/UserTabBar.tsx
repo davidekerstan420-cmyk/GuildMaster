@@ -28,16 +28,14 @@ export default function UserTabBar({ state, navigation }: TabBarProps) {
         };
 
         return (
-          <Pressable
-            key={route.key}
-            onPress={onPress}
-            style={[styles.cell, focused && styles.cellActive]}
-          >
-            <Image
-              source={focused ? icons.active : icons.idle}
-              style={styles.icon}
-              resizeMode="contain"
-            />
+          <Pressable key={route.key} onPress={onPress} style={styles.cell}>
+            {({ pressed }) => (
+              <Image
+                source={focused || pressed ? icons.active : icons.idle}
+                style={styles.icon}
+                resizeMode="contain"
+              />
+            )}
           </Pressable>
         );
       })}
@@ -48,6 +46,5 @@ export default function UserTabBar({ state, navigation }: TabBarProps) {
 const styles = StyleSheet.create({
   bar: { flexDirection: 'row', backgroundColor: ui.tabBar },
   cell: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 8 },
-  cellActive: { backgroundColor: ui.tabActive },
   icon: { width: 72, height: 72 },
 });

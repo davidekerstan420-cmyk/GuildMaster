@@ -35,7 +35,7 @@ export const auth = {
   buttonLime: '#c9d04a',
   buttonGold: '#d9b24f',
   text: '#2b1d17',
-  link: '#1fb5a3',
+  linkYellow: '#ffd93b',
 };
 
 /* ---------- User screens (mobile) ---------- */
@@ -58,18 +58,47 @@ export const ui = {
   divider: '#2b1d17',
   shelfBand: '#7a3f46',
   coinPill: '#4a2a1e',
+    homePanel: '#6b3f35',
+  barTrack: '#d9d9d9',
+  hpFill: '#e0434f',
+  xpFill: '#d4a94e',
+  counter: '#d99a5b',
+  floor: '#4a2a1e',
+  panelText: '#e8c96a',
+  settingsTitle: '#f6ecd0',
+    unreadDot: '#e0434f',
+  readDot: '#9a9a9a',
+  noticeTitle: '#ffd93b',
+    badgeUnlocked: '#cfb25a',
+  badgeLockedCard: '#c5bda8',
+  badgeLockedText: '#7a7468',
+  badgeDate: '#7a5a3a',
+  countYellow: '#ffd93b',
+    stageBg: '#4b4570',
+  counterEdge: '#b06f3a',
 };
 
 /* ---------- Admin panel (desktop web) ---------- */
 export const admin = {
-  sidebar: colors.darkBrown,
-  sidebarWidth: 240,
-  background: '#f5efe3',
+  sidebar: '#25170f',
+  sidebarActive: '#3a2a20',
+  sidebarWidth: 250,
+  sidebarText: '#d9cfc4',
+  bg: '#f8f7f5',
   surface: '#ffffff',
-  border: '#d9cfb8',
-  text: '#2b1d17',
-  accent: colors.gold,
-  contentMaxWidth: 1100,
+  surfaceAlt: '#fbf8f3',
+  border: '#e6dfd5',
+  text: '#3b2a20',
+  muted: '#8b8279',
+  primary: '#8b5a2b',
+  gold: '#d4a94e',
+  tan: '#efe3d3',
+  green: '#2f9e6b', greenBg: '#e3f5ec',
+  orange: '#d9822b', orangeBg: '#fdebd9',
+  red: '#c0344f', redBg: '#fde8ec',
+  purple: '#6c55c8', purpleBg: '#ece8fb',
+  grayBg: '#eeeae4',
+  contentMaxWidth: 1180,
 };
 
 /* ---------- Template leftovers: delete once unused ---------- */
